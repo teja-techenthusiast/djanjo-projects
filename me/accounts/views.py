@@ -1,9 +1,28 @@
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User , auth
 from django.shortcuts import (render, redirect)
 
 
 # Create your views here.
+
+def login(request):
+    if request.method== 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = auth.authenticate(username=username,password=password)
+        if user is not None:
+            auth.login(request, user)
+            return redirect("/")
+        else:
+            messages.info(request,'invalid credentials')
+            return redirect('login')
+
+
+
+
+    else:
+        return render(request,'login.html')
 
 def register(request):
     # checking whether the request is GET or POST
@@ -28,9 +47,14 @@ def register(request):
                                                 first_name=first_name, last_name=last_name)
                 user.save()
                 print('user created')
+                return redirect('register')
         else:
             print('passwords not matching')
             return redirect('register')
         return redirect('/')
     else:
         return render(request, 'register.html')
+
+def logout(request):
+    auth.logout(request)
+    retrun redirect('/') # after logout we r calling the home page
