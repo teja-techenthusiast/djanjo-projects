@@ -57,4 +57,4 @@ def register(request):
 
 def logout(request):
     auth.logout(request)
-    retrun redirect('/') # after logout we r calling the home page
+    return redirect('/') # after logout we r calling the home page
