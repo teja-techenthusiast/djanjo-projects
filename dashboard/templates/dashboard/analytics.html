@@ -1,0 +1,14 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<h2>Bug Analytics</h2>
+<p>Total Bugs: {{ total_bugs }}</p>
+<p>Open Bugs: {{ open_bugs }}</p>
+<p>Resolved Bugs: {{ resolved_bugs }}</p>
+<h3>Bugs by Priority</h3>
+<ul>
+    {% for item in bugs_by_priority %}
+    <li>{{ item.priority }}: {{ item.count }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
