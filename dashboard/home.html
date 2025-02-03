@@ -1,0 +1,18 @@
+{% load static %}
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bug Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'add_bug' %}">Add Bug</a></li>
+            <li><a href="{% url 'upload_data' %}">Upload Data</a></li>
+            <li><a href="{% url 'analytics' %}">Analytics</a></li>
+        </ul>
+    </nav>
+    <h1>Welcome to Bug Tracker</h1>
+</body>
+</html>

@@ -4,10 +4,15 @@ from .forms import BugForm
 import pandas as pd
 from django.db.models import Count
 from datetime import datetime
+import matplotlib.pyplot as plt
+import io
+import urllib, base64
+
 
 # Home Page
 def home(request):
     return render(request, 'dashboard/home.html')
+
 
 # Add Bug
 def add_bug(request):
@@ -15,14 +20,21 @@ def add_bug(request):
         form = BugForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('bug_list')  # Redirecting to bug list after submission
     else:
         form = BugForm()
     return render(request, 'dashboard/add_bug.html', {'form': form})
 
+
+# List Bugs
+def bug_list(request):
+    bugs = Bug.objects.all()
+    return render(request, 'dashboard/bug_list.html', {'bugs': bugs})
+
+
 # Upload Data
 def upload_data(request):
-    if request.method == 'POST' and request.FILES['file']:
+    if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
         df = pd.read_csv(file)
         for _, row in df.iterrows():
@@ -34,19 +46,36 @@ def upload_data(request):
                 assigned_to=row['assigned_to'],
                 date_reported=datetime.strptime(row['date_reported'], '%Y-%m-%d')
             )
-        return redirect('home')
+        return redirect('bug_list')
     return render(request, 'dashboard/upload_data.html')
 
-# Analytics
+
+# Analytics + Charts
 def analytics(request):
     total_bugs = Bug.objects.count()
     open_bugs = Bug.objects.filter(status='Open').count()
     resolved_bugs = Bug.objects.filter(status='Resolved').count()
     bugs_by_priority = Bug.objects.values('priority').annotate(count=Count('priority'))
+
+    # Pie Chart
+    labels = [b['priority'] for b in bugs_by_priority]
+    sizes = [b['count'] for b in bugs_by_priority]
+
+    plt.figure(figsize=(5, 5))
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', colors=['green', 'orange', 'red'])
+    plt.title("Bugs by Priority")
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    graphic = base64.b64encode(image_png).decode('utf-8')
+
     return render(request, 'dashboard/analytics.html', {
         'total_bugs': total_bugs,
         'open_bugs': open_bugs,
         'resolved_bugs': resolved_bugs,
         'bugs_by_priority': bugs_by_priority,
+        'chart': graphic
     })
-
