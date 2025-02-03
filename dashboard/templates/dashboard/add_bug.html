@@ -1,10 +1,13 @@
 {% extends 'dashboard/base.html' %}
 
 {% block content %}
-<h2>Add Bug</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Bug</button>
-</form>
+<h2 class="text-center">Add Bug</h2>
+<div class="col-md-6 offset-md-3">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }} <!-- This renders your form with styling -->
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    </form>
+</div>
 {% endblock %}
+
