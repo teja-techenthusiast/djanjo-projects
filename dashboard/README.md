@@ -27,7 +27,7 @@ The **Bug Tracking Dashboard** is a web application built with **Django** to hel
 
 2. **Navigate to the Project Directory**:
    ```
-   cd bug-tracking-dashboard
+   cd dashboard
    ```
 
 3. **Set Up a Virtual Environment**:
