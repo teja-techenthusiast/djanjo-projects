@@ -33,20 +33,39 @@ def bug_list(request):
 
 
 # Upload Data
+# Upload Data
 def upload_data(request):
     if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
-        df = pd.read_csv(file)
-        for _, row in df.iterrows():
-            Bug.objects.create(
-                title=row['title'],
-                description=row['description'],
-                priority=row['priority'],
-                status=row['status'],
-                assigned_to=row['assigned_to'],
-                date_reported=datetime.strptime(row['date_reported'], '%Y-%m-%d')
-            )
-        return redirect('bug_list')
+
+        # Validate file type
+        if not file.name.endswith('.csv'):
+            return render(request, 'dashboard/upload_data.html', {
+                'error': 'Invalid file format. Please upload a CSV file.'
+            })
+
+        try:
+            # Attempt to read the CSV file
+            df = pd.read_csv(file)
+            for _, row in df.iterrows():
+                Bug.objects.create(
+                    title=row['title'],
+                    description=row['description'],
+                    priority=row['priority'],
+                    status=row['status'],
+                    assigned_to=row['assigned_to'],
+                    date_reported=datetime.strptime(row['date_reported'], '%Y-%m-%d')
+                )
+            return redirect('bug_list')  # Redirect to bug list on success
+        except UnicodeDecodeError:
+            return render(request, 'dashboard/upload_data.html', {
+                'error': 'File encoding error. Please upload a valid CSV file encoded in UTF-8.'
+            })
+        except Exception as e:
+            return render(request, 'dashboard/upload_data.html', {
+                'error': f'An error occurred while processing the file: {str(e)}'
+            })
+
     return render(request, 'dashboard/upload_data.html')
 
 
